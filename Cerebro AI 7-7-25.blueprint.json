@@ -62,18 +62,18 @@
                 "__IMTCONN__": 4270249
             },
             "mapper": {
-                "select": "chat",
-                "temperature": ".3",
-                "top_p": "1",
-                "n_completions": "1",
                 "model": "gpt-4",
-                "max_tokens": "150",
+                "top_p": "1",
+                "select": "chat",
                 "messages": [
                     {
                         "role": "system",
                         "content": "\"Parse symptoms into JSON from: {{1.body}}. Map Symptoms according to severity: Low, Medium, High, and Critical according to your medical diagnosis. Also parse PatientID from {{1.from}}. Ensure Severity is exactly one of: Low, Medium, High, Critical. Output only the JSON object and no additional text:\\n{\\n  \\\"Symptoms\\\": [\\\"symptom1\\\", \\\"symptom2\\\", ...],\\n  \\\"Severity\\\": \\\"Low|Medium|High|Critical\\\",\\n  \\\"PatientID\\\": \\\"string\\\"\\n}\\nExample:\\nInput: \\\"fever, cough, 7, Patient ID: +1234567890\\\"\\nOutput: {\\\"Symptoms\\\": [\\\"fever\\\", \\\"cough\\\"], \\\"Severity\\\": \\\"High\\\", \\\"PatientID\\\": \\\"+1234567890\\\"}\""
                     }
                 ],
+                "max_tokens": "150",
+                "temperature": ".3",
+                "n_completions": "1",
                 "response_format": "text"
             },
             "metadata": {
@@ -83,35 +83,16 @@
                     "name": "Parse into JSON"
                 },
                 "restore": {
-                    "parameters": {
-                        "__IMTCONN__": {
-                            "label": "CerebroAI",
-                            "data": {
-                                "scoped": "true",
-                                "connection": "openai-gpt-3"
-                            }
-                        }
-                    },
                     "expect": {
-                        "select": {
-                            "label": "Create a Chat Completion (GPT and o1 models)"
-                        },
-                        "logit_bias": {
-                            "mode": "chose"
-                        },
-                        "tool_choice": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
                         "stop": {
-                            "mode": "chose"
-                        },
-                        "additionalParameters": {
                             "mode": "chose"
                         },
                         "model": {
                             "mode": "chose",
                             "label": "gpt-4"
+                        },
+                        "select": {
+                            "label": "Create a Chat Completion (GPT and o1 models)"
                         },
                         "messages": {
                             "mode": "chose",
@@ -124,9 +105,28 @@
                                 }
                             ]
                         },
+                        "logit_bias": {
+                            "mode": "chose"
+                        },
+                        "tool_choice": {
+                            "mode": "chose",
+                            "label": "Empty"
+                        },
                         "response_format": {
                             "mode": "chose",
                             "label": "Text"
+                        },
+                        "additionalParameters": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "openai-gpt-3"
+                            },
+                            "label": "CerebroAI"
                         }
                     }
                 },
@@ -194,9 +194,8 @@
                     },
                     {
                         "name": "logit_bias",
-                        "type": "array",
-                        "label": "Token Probability",
                         "spec": {
+                            "name": "value",
                             "spec": [
                                 {
                                     "name": "token",
@@ -216,9 +215,10 @@
                                 }
                             ],
                             "type": "collection",
-                            "label": "Token Probability",
-                            "name": "value"
-                        }
+                            "label": "Token Probability"
+                        },
+                        "type": "array",
+                        "label": "Token Probability"
                     },
                     {
                         "name": "seed",
@@ -239,22 +239,21 @@
                     },
                     {
                         "name": "stop",
+                        "spec": {
+                            "name": "value",
+                            "type": "text",
+                            "label": "Stop Sequence"
+                        },
                         "type": "array",
                         "label": "Stop Sequences",
                         "validate": {
                             "maxItems": 4
-                        },
-                        "spec": {
-                            "type": "text",
-                            "label": "Stop Sequence",
-                            "name": "value"
                         }
                     },
                     {
                         "name": "additionalParameters",
-                        "type": "array",
-                        "label": "Other Input Parameters",
                         "spec": {
+                            "name": "value",
                             "spec": [
                                 {
                                     "name": "key",
@@ -327,9 +326,10 @@
                                 }
                             ],
                             "type": "collection",
-                            "label": "Input Parameter",
-                            "name": "value"
-                        }
+                            "label": "Input Parameter"
+                        },
+                        "type": "array",
+                        "label": "Other Input Parameters"
                     },
                     {
                         "name": "model",
@@ -344,18 +344,13 @@
                     },
                     {
                         "name": "messages",
-                        "type": "array",
-                        "label": "Messages",
-                        "required": true,
                         "spec": {
-                            "label": "Message",
-                            "type": "collection",
+                            "name": "value",
                             "spec": [
                                 {
                                     "name": "role",
                                     "type": "select",
                                     "label": "Role",
-                                    "required": true,
                                     "options": {
                                         "store": [
                                             {
@@ -381,19 +376,9 @@
                                                         "label": "Text Content"
                                                     },
                                                     {
-                                                        "name": "tool_calls",
-                                                        "label": "Tool Calls",
-                                                        "type": "array",
-                                                        "labels": {
-                                                            "add": "Add tool call"
-                                                        },
                                                         "mode": "edit",
-                                                        "mappable": {
-                                                            "help": "You can map the entire `Choices[]: Message.Tool Calls` array from a previous Create a Completion module here."
-                                                        },
+                                                        "name": "tool_calls",
                                                         "spec": {
-                                                            "label": "Tool Call",
-                                                            "type": "collection",
                                                             "spec": [
                                                                 {
                                                                     "name": "type",
@@ -401,39 +386,50 @@
                                                                     "default": "function"
                                                                 },
                                                                 {
+                                                                    "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`.",
                                                                     "name": "id",
                                                                     "type": "text",
-                                                                    "label": "Tool call ID",
-                                                                    "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`."
+                                                                    "label": "Tool call ID"
                                                                 },
                                                                 {
                                                                     "name": "function",
-                                                                    "type": "collection",
-                                                                    "label": "Function",
                                                                     "spec": [
                                                                         {
+                                                                            "help": "The name of the function previously called.",
                                                                             "name": "name",
-                                                                            "label": "Name",
                                                                             "type": "text",
-                                                                            "required": true,
-                                                                            "help": "The name of the function previously called."
+                                                                            "label": "Name",
+                                                                            "required": true
                                                                         },
                                                                         {
+                                                                            "help": "The arguments previously output by the AI.",
                                                                             "name": "arguments",
-                                                                            "label": "Arguments",
                                                                             "type": "text",
-                                                                            "required": true,
-                                                                            "help": "The arguments previously output by the AI."
+                                                                            "label": "Arguments",
+                                                                            "required": true
                                                                         }
-                                                                    ]
+                                                                    ],
+                                                                    "type": "collection",
+                                                                    "label": "Function"
                                                                 }
-                                                            ]
+                                                            ],
+                                                            "type": "collection",
+                                                            "label": "Tool Call"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Tool Calls",
+                                                        "labels": {
+                                                            "add": "Add tool call"
+                                                        },
+                                                        "mappable": {
+                                                            "help": "You can map the entire `Choices[]: Message.Tool Calls` array from a previous Create a Completion module here."
                                                         }
                                                     }
                                                 ]
                                             },
                                             {
                                                 "label": "Developer / System",
+                                                "value": "system",
                                                 "nested": [
                                                     {
                                                         "help": "Text content of the message on behalf of the selected __Role__.",
@@ -441,8 +437,7 @@
                                                         "type": "text",
                                                         "label": "Text Content"
                                                     }
-                                                ],
-                                                "value": "system"
+                                                ]
                                             },
                                             {
                                                 "label": "Tool",
@@ -456,20 +451,25 @@
                                                         "required": true
                                                     },
                                                     {
-                                                        "label": "Tool Call ID.",
+                                                        "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`.",
                                                         "name": "tool_call_id",
                                                         "type": "text",
-                                                        "required": true,
-                                                        "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`."
+                                                        "label": "Tool Call ID.",
+                                                        "required": true
                                                     }
                                                 ]
                                             }
                                         ]
-                                    }
+                                    },
+                                    "required": true
                                 }
                             ],
-                            "name": "value"
-                        }
+                            "type": "collection",
+                            "label": "Message"
+                        },
+                        "type": "array",
+                        "label": "Messages",
+                        "required": true
                     },
                     {
                         "name": "response_format",
@@ -734,7 +734,7 @@
                 "type": 140534
             },
             "mapper": {
-                "json": "{\"Symptoms\": [\"text\"], \"Severity\": \"text\", \"PatientID\": \"text\"}"
+                "json": "\"mapper\": {\n    \"json\": \"{{20.choices[0].message.content}}\"\n}"
             },
             "metadata": {
                 "designer": {
@@ -954,16 +954,13 @@
             },
             "mapper": {
                 "base": "appfAZ25R8yk9skWh",
-                "useColumnId": false,
-                "table": "tblsDM06YJ2zpe7x0",
-                "formula": "{PatientID} = \"{{1.from}}\"",
-                "maxRecords": "1",
                 "sort": [
                     {
                         "field": "Timestamp Last Modified",
                         "direction": "desc"
                     }
                 ],
+                "table": "tblsDM06YJ2zpe7x0",
                 "fields": [
                     "PatientID",
                     "Symptoms",
@@ -973,7 +970,10 @@
                     "ConversationID",
                     "Timestamp Last Modified",
                     "Timestamp Creation"
-                ]
+                ],
+                "formula": "{PatientID} = \\\"{{1.from}}\\\"",
+                "maxRecords": "1",
+                "useColumnId": false
             },
             "metadata": {
                 "designer": {
@@ -982,26 +982,10 @@
                     "name": "Check Existing Record "
                 },
                 "restore": {
-                    "parameters": {
-                        "__IMTCONN__": {
-                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)",
-                            "data": {
-                                "scoped": "true",
-                                "connection": "airtable3"
-                            }
-                        }
-                    },
                     "expect": {
                         "base": {
                             "mode": "chose",
                             "label": "ClinicalSupportDB"
-                        },
-                        "useColumnId": {
-                            "mode": "chose"
-                        },
-                        "table": {
-                            "mode": "chose",
-                            "label": "Interaction Point"
                         },
                         "sort": {
                             "mode": "chose",
@@ -1021,6 +1005,10 @@
                         "view": {
                             "mode": "chose"
                         },
+                        "table": {
+                            "mode": "chose",
+                            "label": "Interaction Point"
+                        },
                         "fields": {
                             "mode": "chose",
                             "label": [
@@ -1033,6 +1021,18 @@
                                 "Timestamp Last Modified",
                                 "Timestamp Creation"
                             ]
+                        },
+                        "useColumnId": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "airtable3"
+                            },
+                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)"
                         }
                     }
                 },
@@ -1075,15 +1075,13 @@
                     },
                     {
                         "name": "sort",
-                        "type": "array",
-                        "label": "Sort",
                         "spec": [
                             {
                                 "name": "field",
                                 "type": "select",
                                 "label": "Field",
-                                "options": [],
-                                "dynamic": true
+                                "dynamic": true,
+                                "options": []
                             },
                             {
                                 "name": "direction",
@@ -1100,7 +1098,9 @@
                                     }
                                 ]
                             }
-                        ]
+                        ],
+                        "type": "array",
+                        "label": "Sort"
                     },
                     {
                         "name": "view",
@@ -1116,16 +1116,6 @@
                 ],
                 "interface": [
                     {
-                        "name": "__IMTLENGTH__",
-                        "label": "Total number of bundles",
-                        "type": "uinteger"
-                    },
-                    {
-                        "name": "__IMTINDEX__",
-                        "label": "Bundle order position",
-                        "type": "uinteger"
-                    },
-                    {
                         "name": "id",
                         "type": "text",
                         "label": "ID"
@@ -1137,43 +1127,43 @@
                     },
                     {
                         "name": "PatientID",
-                        "label": "PatientID",
-                        "type": "text"
+                        "type": "text",
+                        "label": "PatientID"
                     },
                     {
                         "name": "Symptoms",
-                        "label": "Symptoms",
-                        "type": "text"
+                        "type": "text",
+                        "label": "Symptoms"
                     },
                     {
                         "name": "State",
-                        "label": "State",
-                        "type": "text"
+                        "type": "text",
+                        "label": "State"
                     },
                     {
                         "name": "Diagnosis",
-                        "label": "Diagnosis",
-                        "type": "text"
+                        "type": "text",
+                        "label": "Diagnosis"
                     },
                     {
                         "name": "Severity",
-                        "label": "Severity",
-                        "type": "text"
+                        "type": "text",
+                        "label": "Severity"
                     },
                     {
                         "name": "ConversationID",
-                        "label": "ConversationID",
-                        "type": "text"
+                        "type": "text",
+                        "label": "ConversationID"
                     },
                     {
                         "name": "Timestamp Last Modified",
-                        "label": "Timestamp Last Modified",
-                        "type": "date"
+                        "type": "date",
+                        "label": "Timestamp Last Modified"
                     },
                     {
                         "name": "Timestamp Creation",
-                        "label": "Timestamp Creation",
-                        "type": "date"
+                        "type": "date",
+                        "label": "Timestamp Creation"
                     }
                 ],
                 "advanced": true
@@ -1208,20 +1198,15 @@
                                             "a": "{{7.__IMTLENGTH__}}",
                                             "b": "0",
                                             "o": "number:greater"
-                                        },
-                                        {
-                                            "a": "{{7.AppointmentOffered}}",
-                                            "b": "True",
-                                            "o": "text:notequal"
                                         }
                                     ]
                                 ]
                             },
                             "mapper": {
+                                "id": "{{1.account_sid}}",
                                 "base": "appfAZ25R8yk9skWh",
-                                "useColumnId": false,
                                 "table": "tblsDM06YJ2zpe7x0",
-                                "id": "{{1.account_sid}}"
+                                "useColumnId": false
                             },
                             "metadata": {
                                 "designer": {
@@ -1229,26 +1214,26 @@
                                     "y": 225
                                 },
                                 "restore": {
-                                    "parameters": {
-                                        "__IMTCONN__": {
-                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)",
-                                            "data": {
-                                                "scoped": "true",
-                                                "connection": "airtable3"
-                                            }
-                                        }
-                                    },
                                     "expect": {
                                         "base": {
                                             "mode": "chose",
                                             "label": "ClinicalSupportDB"
                                         },
-                                        "useColumnId": {
-                                            "mode": "chose"
-                                        },
                                         "table": {
                                             "mode": "chose",
                                             "label": "Interaction Point"
+                                        },
+                                        "useColumnId": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "airtable3"
+                                            },
+                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)"
                                         }
                                     }
                                 },
@@ -1299,43 +1284,43 @@
                                     },
                                     {
                                         "name": "PatientID",
-                                        "label": "PatientID",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "PatientID"
                                     },
                                     {
                                         "name": "Symptoms",
-                                        "label": "Symptoms",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "Symptoms"
                                     },
                                     {
                                         "name": "State",
-                                        "label": "State",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "State"
                                     },
                                     {
                                         "name": "Diagnosis",
-                                        "label": "Diagnosis",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "Diagnosis"
                                     },
                                     {
                                         "name": "Severity",
-                                        "label": "Severity",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "Severity"
                                     },
                                     {
                                         "name": "ConversationID",
-                                        "label": "ConversationID",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "ConversationID"
                                     },
                                     {
                                         "name": "Timestamp Last Modified",
-                                        "label": "Timestamp Last Modified",
-                                        "type": "date"
+                                        "type": "date",
+                                        "label": "Timestamp Last Modified"
                                     },
                                     {
                                         "name": "Timestamp Creation",
-                                        "label": "Timestamp Creation",
-                                        "type": "date"
+                                        "type": "date",
+                                        "label": "Timestamp Creation"
                                     }
                                 ],
                                 "advanced": true
@@ -1349,19 +1334,19 @@
                                 "__IMTCONN__": 3819224
                             },
                             "mapper": {
-                                "base": "appfAZ25R8yk9skWh",
-                                "typecast": false,
-                                "useColumnId": false,
-                                "table": "tblsDM06YJ2zpe7x0",
                                 "id": "{{7.id}}",
+                                "base": "appfAZ25R8yk9skWh",
+                                "table": "tblsDM06YJ2zpe7x0",
                                 "record": {
-                                    "fldjAq5s0FtarIjxg": "{{1.from}}",
                                     "fldZpOBb1RzjckYuY": "{{4.Symptoms}}",
+                                    "fldbpuSH7rAeBQDZj": "{{1.account_sid}}",
                                     "fldgg0grpoKXxWK6m": "Waiting",
-                                    "fldzyxpaFxljdk3RA": "{{4.Diagnosis}}",
-                                    "flduGiZ2j9Mrt7WSd": "{{if((4.Severity = \\) + \"Low\\\"; \\ + \"Low\\\"; (4.Severity = \\) + \"Medium\\\"; \\ + \"Medium\\\"; (4.Severity = \\) + \"High\\\"; \\ + \"High\\\"; (4.Severity = \\) + \"Critical\\\"; \\ + \"Critical\\\"; \\ + \"Low\\\")}}",
-                                    "fldbpuSH7rAeBQDZj": "{{1.account_sid}}"
-                                }
+                                    "fldjAq5s0FtarIjxg": "{{1.from}}",
+                                    "flduGiZ2j9Mrt7WSd": "{{switch(4.Severity; \\ + \"Low\\\"; \\ + \"Low\\\"; \\ + \"Medium\\\"; \\ + \"Medium\\\"; \\ + \"High\\\"; \\ + \"High\\\"; \\ + \"Critical\\\"; \\ + \"Critical\\\"; \\ + \"Low\\\")}}",
+                                    "fldzyxpaFxljdk3RA": "{{4.Diagnosis}}"
+                                },
+                                "typecast": false,
+                                "useColumnId": false
                             },
                             "metadata": {
                                 "designer": {
@@ -1369,30 +1354,15 @@
                                     "y": 5
                                 },
                                 "restore": {
-                                    "parameters": {
-                                        "__IMTCONN__": {
-                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)",
-                                            "data": {
-                                                "scoped": "true",
-                                                "connection": "airtable3"
-                                            }
-                                        }
-                                    },
                                     "expect": {
+                                        "id": {
+                                            "collapsed": true
+                                        },
                                         "base": {
                                             "label": "ClinicalSupportDB"
                                         },
-                                        "typecast": {
-                                            "mode": "chose"
-                                        },
-                                        "useColumnId": {
-                                            "mode": "chose"
-                                        },
                                         "table": {
                                             "label": "Interaction Point"
-                                        },
-                                        "id": {
-                                            "collapsed": true
                                         },
                                         "record": {
                                             "nested": {
@@ -1403,6 +1373,21 @@
                                                     "mode": "edit"
                                                 }
                                             }
+                                        },
+                                        "typecast": {
+                                            "mode": "chose"
+                                        },
+                                        "useColumnId": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "airtable3"
+                                            },
+                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)"
                                         }
                                     }
                                 },
@@ -1447,8 +1432,6 @@
                                     },
                                     {
                                         "name": "record",
-                                        "type": "collection",
-                                        "label": "Record",
                                         "spec": [
                                             {
                                                 "name": "fldjAq5s0FtarIjxg",
@@ -1461,10 +1444,10 @@
                                                 "label": "Symptoms"
                                             },
                                             {
+                                                "mode": "edit",
                                                 "name": "fldgg0grpoKXxWK6m",
                                                 "type": "select",
-                                                "label": "State",
-                                                "mode": "edit"
+                                                "label": "State"
                                             },
                                             {
                                                 "name": "fldzyxpaFxljdk3RA",
@@ -1472,17 +1455,19 @@
                                                 "label": "Diagnosis"
                                             },
                                             {
+                                                "mode": "edit",
                                                 "name": "flduGiZ2j9Mrt7WSd",
                                                 "type": "select",
-                                                "label": "Severity",
-                                                "mode": "edit"
+                                                "label": "Severity"
                                             },
                                             {
                                                 "name": "fldbpuSH7rAeBQDZj",
                                                 "type": "text",
                                                 "label": "ConversationID"
                                             }
-                                        ]
+                                        ],
+                                        "type": "collection",
+                                        "label": "Record"
                                     }
                                 ],
                                 "interface": [
@@ -1498,43 +1483,43 @@
                                     },
                                     {
                                         "name": "PatientID",
-                                        "label": "PatientID",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "PatientID"
                                     },
                                     {
                                         "name": "Symptoms",
-                                        "label": "Symptoms",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "Symptoms"
                                     },
                                     {
                                         "name": "State",
-                                        "label": "State",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "State"
                                     },
                                     {
                                         "name": "Diagnosis",
-                                        "label": "Diagnosis",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "Diagnosis"
                                     },
                                     {
                                         "name": "Severity",
-                                        "label": "Severity",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "Severity"
                                     },
                                     {
                                         "name": "ConversationID",
-                                        "label": "ConversationID",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "ConversationID"
                                     },
                                     {
                                         "name": "Timestamp Last Modified",
-                                        "label": "Timestamp Last Modified",
-                                        "type": "date"
+                                        "type": "date",
+                                        "label": "Timestamp Last Modified"
                                     },
                                     {
                                         "name": "Timestamp Creation",
-                                        "label": "Timestamp Creation",
-                                        "type": "date"
+                                        "type": "date",
+                                        "label": "Timestamp Creation"
                                     }
                                 ]
                             }
@@ -1727,18 +1712,18 @@
                                 "__IMTCONN__": 4270249
                             },
                             "mapper": {
-                                "select": "chat",
-                                "temperature": ".3",
-                                "top_p": "1",
-                                "n_completions": "1",
                                 "model": "chatgpt-4o-latest",
-                                "max_tokens": "250",
+                                "top_p": "1",
+                                "select": "chat",
                                 "messages": [
                                     {
                                         "role": "system",
                                         "content": "\"You are to diagnose patients' self-reported symptoms as if you were a real medical doctor responsible for the lives of millions of people. Diagnose symptoms and set a triage hierarchy for priority scheduling. Make a preliminary diagnosis with information such as {{18.Symptoms}} and self-reported {{18.Severity}} (scale 1-10). Map severity: 1-3=Low, 4-6=Medium, 7-8=High, 9-10=Critical. Ensure severity is exactly one of: Low, Medium, High, Critical. Output only the JSON object and no additional text:\\n{\\n  \\\"symptoms\\\": [\\\"symptom1\\\", \\\"symptom2\\\", ...],\\n  \\\"diagnosis\\\": \\\"initial diagnosis\\\",\\n  \\\"severity\\\": \\\"Low|Medium|High|Critical\\\"\\n}\\nExample:\\nInput: \\\"fever, cough, 7\\\"\\nOutput: {\\\"symptoms\\\": [\\\"fever\\\", \\\"cough\\\"], \\\"diagnosis\\\": \\\"Possible Flu\\\", \\\"severity\\\": \\\"High\\\"}\""
                                     }
                                 ],
+                                "max_tokens": "250",
+                                "temperature": ".3",
+                                "n_completions": "1",
                                 "response_format": "json_object",
                                 "parseJSONResponse": true
                             },
@@ -1749,35 +1734,16 @@
                                     "name": "Diagnose & Triage"
                                 },
                                 "restore": {
-                                    "parameters": {
-                                        "__IMTCONN__": {
-                                            "label": "CerebroAI",
-                                            "data": {
-                                                "scoped": "true",
-                                                "connection": "openai-gpt-3"
-                                            }
-                                        }
-                                    },
                                     "expect": {
-                                        "select": {
-                                            "label": "Create a Chat Completion (GPT and o1 models)"
-                                        },
-                                        "logit_bias": {
-                                            "mode": "chose"
-                                        },
-                                        "tool_choice": {
-                                            "mode": "chose",
-                                            "label": "Empty"
-                                        },
                                         "stop": {
-                                            "mode": "chose"
-                                        },
-                                        "additionalParameters": {
                                             "mode": "chose"
                                         },
                                         "model": {
                                             "mode": "chose",
                                             "label": "chatgpt-4o-latest (system)"
+                                        },
+                                        "select": {
+                                            "label": "Create a Chat Completion (GPT and o1 models)"
                                         },
                                         "messages": {
                                             "mode": "chose",
@@ -1790,12 +1756,31 @@
                                                 }
                                             ]
                                         },
+                                        "logit_bias": {
+                                            "mode": "chose"
+                                        },
+                                        "tool_choice": {
+                                            "mode": "chose",
+                                            "label": "Empty"
+                                        },
                                         "response_format": {
                                             "mode": "chose",
                                             "label": "JSON Object"
                                         },
                                         "parseJSONResponse": {
                                             "mode": "chose"
+                                        },
+                                        "additionalParameters": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "openai-gpt-3"
+                                            },
+                                            "label": "CerebroAI"
                                         }
                                     }
                                 },
@@ -1863,9 +1848,8 @@
                                     },
                                     {
                                         "name": "logit_bias",
-                                        "type": "array",
-                                        "label": "Token Probability",
                                         "spec": {
+                                            "name": "value",
                                             "spec": [
                                                 {
                                                     "name": "token",
@@ -1885,9 +1869,10 @@
                                                 }
                                             ],
                                             "type": "collection",
-                                            "label": "Token Probability",
-                                            "name": "value"
-                                        }
+                                            "label": "Token Probability"
+                                        },
+                                        "type": "array",
+                                        "label": "Token Probability"
                                     },
                                     {
                                         "name": "seed",
@@ -1908,22 +1893,21 @@
                                     },
                                     {
                                         "name": "stop",
+                                        "spec": {
+                                            "name": "value",
+                                            "type": "text",
+                                            "label": "Stop Sequence"
+                                        },
                                         "type": "array",
                                         "label": "Stop Sequences",
                                         "validate": {
                                             "maxItems": 4
-                                        },
-                                        "spec": {
-                                            "type": "text",
-                                            "label": "Stop Sequence",
-                                            "name": "value"
                                         }
                                     },
                                     {
                                         "name": "additionalParameters",
-                                        "type": "array",
-                                        "label": "Other Input Parameters",
                                         "spec": {
+                                            "name": "value",
                                             "spec": [
                                                 {
                                                     "name": "key",
@@ -1996,9 +1980,10 @@
                                                 }
                                             ],
                                             "type": "collection",
-                                            "label": "Input Parameter",
-                                            "name": "value"
-                                        }
+                                            "label": "Input Parameter"
+                                        },
+                                        "type": "array",
+                                        "label": "Other Input Parameters"
                                     },
                                     {
                                         "name": "model",
@@ -2013,18 +1998,13 @@
                                     },
                                     {
                                         "name": "messages",
-                                        "type": "array",
-                                        "label": "Messages",
-                                        "required": true,
                                         "spec": {
-                                            "label": "Message",
-                                            "type": "collection",
+                                            "name": "value",
                                             "spec": [
                                                 {
                                                     "name": "role",
                                                     "type": "select",
                                                     "label": "Role",
-                                                    "required": true,
                                                     "options": {
                                                         "store": [
                                                             {
@@ -2041,30 +2021,28 @@
                                                                         "name": "imageInputType",
                                                                         "type": "select",
                                                                         "label": "Image Input Type",
-                                                                        "mappable": false,
                                                                         "options": [
                                                                             {
-                                                                                "value": "url",
                                                                                 "label": "URL",
+                                                                                "value": "url",
                                                                                 "nested": [
                                                                                     {
+                                                                                        "help": "Make sure to use a publicly accessible URL.\nYou can test if your image is publicly accessible by opening the link in an incognito tab.",
                                                                                         "name": "imageUrl",
-                                                                                        "label": "Image URL",
                                                                                         "type": "url",
-                                                                                        "help": "Make sure to use a publicly accessible URL.\nYou can test if your image is publicly accessible by opening the link in an incognito tab."
+                                                                                        "label": "Image URL"
                                                                                     }
                                                                                 ]
                                                                             },
                                                                             {
-                                                                                "value": "file",
                                                                                 "label": "Image File",
+                                                                                "value": "file",
                                                                                 "nested": [
                                                                                     {
                                                                                         "name": "imageFile",
-                                                                                        "label": "Image",
-                                                                                        "type": "collection",
                                                                                         "spec": [
                                                                                             {
+                                                                                                "help": "Accepted extensions: `.jpg`, `.jpeg`, `.png`, `.webp` and `.gif`.",
                                                                                                 "name": "imageFilename",
                                                                                                 "type": "filename",
                                                                                                 "label": "Image Filename",
@@ -2075,8 +2053,7 @@
                                                                                                     "png",
                                                                                                     "webp",
                                                                                                     "gif"
-                                                                                                ],
-                                                                                                "help": "Accepted extensions: `.jpg`, `.jpeg`, `.png`, `.webp` and `.gif`."
+                                                                                                ]
                                                                                             },
                                                                                             {
                                                                                                 "name": "imageData",
@@ -2084,30 +2061,33 @@
                                                                                                 "label": "Image Data",
                                                                                                 "semantic": "file:data"
                                                                                             }
-                                                                                        ]
+                                                                                        ],
+                                                                                        "type": "collection",
+                                                                                        "label": "Image"
                                                                                     }
                                                                                 ]
                                                                             }
-                                                                        ]
+                                                                        ],
+                                                                        "mappable": false
                                                                     },
                                                                     {
+                                                                        "help": "Recommended value: `Auto`",
                                                                         "name": "imageDetail",
                                                                         "type": "select",
                                                                         "label": "Image Detail",
-                                                                        "help": "Recommended value: `Auto`",
                                                                         "options": [
                                                                             {
+                                                                                "label": "Auto",
                                                                                 "value": "auto",
-                                                                                "default": true,
-                                                                                "label": "Auto"
+                                                                                "default": true
                                                                             },
                                                                             {
-                                                                                "value": "high",
-                                                                                "label": "High"
+                                                                                "label": "High",
+                                                                                "value": "high"
                                                                             },
                                                                             {
-                                                                                "value": "low",
-                                                                                "label": "Low"
+                                                                                "label": "Low",
+                                                                                "value": "low"
                                                                             }
                                                                         ]
                                                                     }
@@ -2124,19 +2104,9 @@
                                                                         "label": "Text Content"
                                                                     },
                                                                     {
-                                                                        "name": "tool_calls",
-                                                                        "label": "Tool Calls",
-                                                                        "type": "array",
-                                                                        "labels": {
-                                                                            "add": "Add tool call"
-                                                                        },
                                                                         "mode": "edit",
-                                                                        "mappable": {
-                                                                            "help": "You can map the entire `Choices[]: Message.Tool Calls` array from a previous Create a Completion module here."
-                                                                        },
+                                                                        "name": "tool_calls",
                                                                         "spec": {
-                                                                            "label": "Tool Call",
-                                                                            "type": "collection",
                                                                             "spec": [
                                                                                 {
                                                                                     "name": "type",
@@ -2144,39 +2114,50 @@
                                                                                     "default": "function"
                                                                                 },
                                                                                 {
+                                                                                    "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`.",
                                                                                     "name": "id",
                                                                                     "type": "text",
-                                                                                    "label": "Tool call ID",
-                                                                                    "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`."
+                                                                                    "label": "Tool call ID"
                                                                                 },
                                                                                 {
                                                                                     "name": "function",
-                                                                                    "type": "collection",
-                                                                                    "label": "Function",
                                                                                     "spec": [
                                                                                         {
+                                                                                            "help": "The name of the function previously called.",
                                                                                             "name": "name",
-                                                                                            "label": "Name",
                                                                                             "type": "text",
-                                                                                            "required": true,
-                                                                                            "help": "The name of the function previously called."
+                                                                                            "label": "Name",
+                                                                                            "required": true
                                                                                         },
                                                                                         {
+                                                                                            "help": "The arguments previously output by the AI.",
                                                                                             "name": "arguments",
-                                                                                            "label": "Arguments",
                                                                                             "type": "text",
-                                                                                            "required": true,
-                                                                                            "help": "The arguments previously output by the AI."
+                                                                                            "label": "Arguments",
+                                                                                            "required": true
                                                                                         }
-                                                                                    ]
+                                                                                    ],
+                                                                                    "type": "collection",
+                                                                                    "label": "Function"
                                                                                 }
-                                                                            ]
+                                                                            ],
+                                                                            "type": "collection",
+                                                                            "label": "Tool Call"
+                                                                        },
+                                                                        "type": "array",
+                                                                        "label": "Tool Calls",
+                                                                        "labels": {
+                                                                            "add": "Add tool call"
+                                                                        },
+                                                                        "mappable": {
+                                                                            "help": "You can map the entire `Choices[]: Message.Tool Calls` array from a previous Create a Completion module here."
                                                                         }
                                                                     }
                                                                 ]
                                                             },
                                                             {
                                                                 "label": "Developer / System",
+                                                                "value": "system",
                                                                 "nested": [
                                                                     {
                                                                         "help": "Text content of the message on behalf of the selected __Role__.",
@@ -2184,8 +2165,7 @@
                                                                         "type": "text",
                                                                         "label": "Text Content"
                                                                     }
-                                                                ],
-                                                                "value": "system"
+                                                                ]
                                                             },
                                                             {
                                                                 "label": "Tool",
@@ -2199,20 +2179,25 @@
                                                                         "required": true
                                                                     },
                                                                     {
-                                                                        "label": "Tool Call ID.",
+                                                                        "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`.",
                                                                         "name": "tool_call_id",
                                                                         "type": "text",
-                                                                        "required": true,
-                                                                        "help": "Map this directly from the output of a previous **Create a Completion** module. Look for `Choices[]: Message.Tool Calls[]: ID`."
+                                                                        "label": "Tool Call ID.",
+                                                                        "required": true
                                                                     }
                                                                 ]
                                                             }
                                                         ]
-                                                    }
+                                                    },
+                                                    "required": true
                                                 }
                                             ],
-                                            "name": "value"
-                                        }
+                                            "type": "collection",
+                                            "label": "Message"
+                                        },
+                                        "type": "array",
+                                        "label": "Messages",
+                                        "required": true
                                     },
                                     {
                                         "name": "response_format",
@@ -2684,7 +2669,7 @@
                                             "mapper": {
                                                 "name": "Diagnosis and Triage",
                                                 "scope": "roundtrip",
-                                                "value": "{\n  \"scope\": \"roundtrip\",\n  \"variables\": [\n    {\n      \"name\": \"Diagnosis\",\n      \"value\": \"{{19.result.diagnosis}}\"\n    },\n    {\n      \"name\": \"Severity\",\n      \"value\": \"{{19.result.severity}}\"\n    },\n    {\n      \"name\": \"Symptoms\",\n      \"value\": \"{{19.result.symptoms}}\"\n    }\n  ]\n}"
+                                                "value": "\"id\": 24,\n\"module\": \"util:SetVariables\",\n\"version\": 1,\n\"parameters\": {},\n\"filter\": {\n    \"name\": \"Diagnosis Complete\",\n    \"conditions\": [\n        [\n            {\n                \"a\": \"{{19.result.diagnosis}}\",\n                \"b\": \"\",\n                \"o\": \"text:notempty\"\n            }\n        ]\n    ]\n},\n\"mapper\": {\n    \"scope\": \"roundtrip\",\n    \"variables\": [\n        {\n            \"name\": \"Diagnosis\",\n            \"value\": \"{{19.result.diagnosis}}\"\n        },\n        {\n            \"name\": \"Severity\",\n            \"value\": \"{{19.result.severity}}\"\n        },\n        {\n            \"name\": \"Symptoms\",\n            \"value\": \"{{19.result.symptoms}}\"\n        }\n    ]\n},\n\"metadata\": {\n    \"designer\": {\n        \"x\": 2294,\n        \"y\": 340,\n        \"name\": \"Diagnosis&Triage\"\n    },\n    \"restore\": {\n        \"expect\": {\n            \"scope\": {\n                \"label\": \"One cycle\"\n            }\n        }\n    },\n    \"expect\": [\n        {\n            \"name\": \"variables\",\n            \"spec\": [\n                {\n                    \"name\": \"name\",\n                    \"type\": \"text\",\n                    \"label\": \"Variable name\",\n                    \"required\": true\n                },\n                {\n                    \"name\": \"value\",\n                    \"type\": \"any\",\n                    \"label\": \"Variable value\"\n                }\n            ],\n            \"type\": \"array\",\n            \"label\": \"Variables\"\n        },\n        {\n            \"name\": \"scope\",\n            \"type\": \"select\",\n            \"label\": \"Variable lifetime\",\n            \"required\": true,\n            \"validate\": {\n                \"enum\": [\n                    \"roundtrip\",\n                    \"execution\"\n                ]\n            }\n        }\n    ],\n    \"interface\": [\n        {\n            \"name\": \"Diagnosis\",\n            \"type\": \"any\",\n            \"label\": \"Diagnosis\"\n        },\n        {\n            \"name\": \"Severity\",\n            \"type\": \"any\",\n            \"label\": \"Severity\"\n        },\n        {\n            \"name\": \"Symptoms\",\n            \"type\": \"any\",\n            \"label\": \"Symptoms\"\n        }\n    ],\n    \"advanced\": true\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -2727,8 +2712,8 @@
                                                 "interface": [
                                                     {
                                                         "name": "Diagnosis and Triage",
-                                                        "label": "Diagnosis and Triage",
-                                                        "type": "any"
+                                                        "type": "any",
+                                                        "label": "Diagnosis and Triage"
                                                     }
                                                 ],
                                                 "advanced": true
@@ -2742,19 +2727,19 @@
                                                 "__IMTCONN__": 3819224
                                             },
                                             "mapper": {
-                                                "base": "appfAZ25R8yk9skWh",
-                                                "typecast": false,
-                                                "useColumnId": false,
-                                                "table": "tblsDM06YJ2zpe7x0",
                                                 "id": "{{1.account_sid}}",
+                                                "base": "appfAZ25R8yk9skWh",
+                                                "table": "tblsDM06YJ2zpe7x0",
                                                 "record": {
-                                                    "fldjAq5s0FtarIjxg": "{{1.from}}",
                                                     "fldZpOBb1RzjckYuY": "{{24.`Diagnosis and Triage`}}",
-                                                    "fldgg0grpoKXxWK6m": "Waiting",
-                                                    "fldzyxpaFxljdk3RA": "{{24.`Diagnosis and Triage`}}",
+                                                    "fldbpuSH7rAeBQDZj": "{{1.sid}}",
+                                                    "fldgg0grpoKXxWK6m": "Diagnosed",
+                                                    "fldjAq5s0FtarIjxg": "{{1.from}}",
                                                     "flduGiZ2j9Mrt7WSd": "{{if((24.Severity = \\) + \"Low\\\"; \\ + \"Low\\\"; (24.Severity = \\) + \"Medium\\\"; \\ + \"Medium\\\"; (24.Severity = \\) + \"High\\\"; \\ + \"High\\\"; (24.Severity = \\) + \"Critical\\\"; \\ + \"Critical\\\"; \\ + \"Low\\\")}}",
-                                                    "fldbpuSH7rAeBQDZj": "{{1.sid}}"
-                                                }
+                                                    "fldzyxpaFxljdk3RA": "{{24.`Diagnosis and Triage`}}"
+                                                },
+                                                "typecast": false,
+                                                "useColumnId": false
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -2762,24 +2747,9 @@
                                                     "y": 661
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "airtable3"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
                                                         "base": {
                                                             "label": "ClinicalSupportDB"
-                                                        },
-                                                        "typecast": {
-                                                            "mode": "chose"
-                                                        },
-                                                        "useColumnId": {
-                                                            "mode": "chose"
                                                         },
                                                         "table": {
                                                             "label": "Interaction Point"
@@ -2793,6 +2763,21 @@
                                                                     "mode": "edit"
                                                                 }
                                                             }
+                                                        },
+                                                        "typecast": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "useColumnId": {
+                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "airtable3"
+                                                            },
+                                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)"
                                                         }
                                                     }
                                                 },
@@ -2837,8 +2822,6 @@
                                                     },
                                                     {
                                                         "name": "record",
-                                                        "type": "collection",
-                                                        "label": "Record",
                                                         "spec": [
                                                             {
                                                                 "name": "fldjAq5s0FtarIjxg",
@@ -2851,10 +2834,10 @@
                                                                 "label": "Symptoms"
                                                             },
                                                             {
+                                                                "mode": "edit",
                                                                 "name": "fldgg0grpoKXxWK6m",
                                                                 "type": "select",
-                                                                "label": "State",
-                                                                "mode": "edit"
+                                                                "label": "State"
                                                             },
                                                             {
                                                                 "name": "fldzyxpaFxljdk3RA",
@@ -2862,17 +2845,19 @@
                                                                 "label": "Diagnosis"
                                                             },
                                                             {
+                                                                "mode": "edit",
                                                                 "name": "flduGiZ2j9Mrt7WSd",
                                                                 "type": "select",
-                                                                "label": "Severity",
-                                                                "mode": "edit"
+                                                                "label": "Severity"
                                                             },
                                                             {
                                                                 "name": "fldbpuSH7rAeBQDZj",
                                                                 "type": "text",
                                                                 "label": "ConversationID"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Record"
                                                     }
                                                 ],
                                                 "interface": [
@@ -2888,45 +2873,46 @@
                                                     },
                                                     {
                                                         "name": "PatientID",
-                                                        "label": "PatientID",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "PatientID"
                                                     },
                                                     {
                                                         "name": "Symptoms",
-                                                        "label": "Symptoms",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "Symptoms"
                                                     },
                                                     {
                                                         "name": "State",
-                                                        "label": "State",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "State"
                                                     },
                                                     {
                                                         "name": "Diagnosis",
-                                                        "label": "Diagnosis",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "Diagnosis"
                                                     },
                                                     {
                                                         "name": "Severity",
-                                                        "label": "Severity",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "Severity"
                                                     },
                                                     {
                                                         "name": "ConversationID",
-                                                        "label": "ConversationID",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "ConversationID"
                                                     },
                                                     {
                                                         "name": "Timestamp Last Modified",
-                                                        "label": "Timestamp Last Modified",
-                                                        "type": "date"
+                                                        "type": "date",
+                                                        "label": "Timestamp Last Modified"
                                                     },
                                                     {
                                                         "name": "Timestamp Creation",
-                                                        "label": "Timestamp Creation",
-                                                        "type": "date"
+                                                        "type": "date",
+                                                        "label": "Timestamp Creation"
                                                     }
-                                                ]
+                                                ],
+                                                "advanced": true
                                             }
                                         },
                                         {
@@ -2938,16 +2924,13 @@
                                             },
                                             "mapper": {
                                                 "base": "appfAZ25R8yk9skWh",
-                                                "useColumnId": false,
-                                                "table": "tblLcjS5HS4uoxTyg",
-                                                "formula": "[\n  {\n    \"field\": \"AppointmentTime\",\n    \"direction\": \"asc\"\n  }\n]",
-                                                "maxRecords": "10",
                                                 "sort": [
                                                     {
                                                         "field": "AppointmentTime",
                                                         "direction": "asc"
                                                     }
                                                 ],
+                                                "table": "tblLcjS5HS4uoxTyg",
                                                 "fields": [
                                                     "PatientID",
                                                     "AppointmentTime",
@@ -2955,7 +2938,10 @@
                                                     "Timestamp Creation",
                                                     "Timestamp Last Modified",
                                                     "Appointment Offered "
-                                                ]
+                                                ],
+                                                "formula": "[\n  {\n    \"field\": \"AppointmentTime\",\n    \"direction\": \"asc\"\n  }\n]",
+                                                "maxRecords": "10",
+                                                "useColumnId": false
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -2963,26 +2949,10 @@
                                                     "y": 982
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "airtable3"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
                                                         "base": {
                                                             "mode": "chose",
                                                             "label": "ClinicalSupportDB"
-                                                        },
-                                                        "useColumnId": {
-                                                            "mode": "chose"
-                                                        },
-                                                        "table": {
-                                                            "mode": "chose",
-                                                            "label": "Appointments"
                                                         },
                                                         "sort": {
                                                             "mode": "chose",
@@ -3002,6 +2972,10 @@
                                                         "view": {
                                                             "mode": "chose"
                                                         },
+                                                        "table": {
+                                                            "mode": "chose",
+                                                            "label": "Appointments"
+                                                        },
                                                         "fields": {
                                                             "mode": "chose",
                                                             "label": [
@@ -3012,6 +2986,18 @@
                                                                 "Timestamp Last Modified",
                                                                 "Appointment Offered "
                                                             ]
+                                                        },
+                                                        "useColumnId": {
+                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "airtable3"
+                                                            },
+                                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)"
                                                         }
                                                     }
                                                 },
@@ -3054,15 +3040,13 @@
                                                     },
                                                     {
                                                         "name": "sort",
-                                                        "type": "array",
-                                                        "label": "Sort",
                                                         "spec": [
                                                             {
                                                                 "name": "field",
                                                                 "type": "select",
                                                                 "label": "Field",
-                                                                "options": [],
-                                                                "dynamic": true
+                                                                "dynamic": true,
+                                                                "options": []
                                                             },
                                                             {
                                                                 "name": "direction",
@@ -3079,7 +3063,9 @@
                                                                     }
                                                                 ]
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Sort"
                                                     },
                                                     {
                                                         "name": "view",
@@ -3096,13 +3082,13 @@
                                                 "interface": [
                                                     {
                                                         "name": "__IMTLENGTH__",
-                                                        "label": "Total number of bundles",
-                                                        "type": "uinteger"
+                                                        "type": "uinteger",
+                                                        "label": "Total number of bundles"
                                                     },
                                                     {
                                                         "name": "__IMTINDEX__",
-                                                        "label": "Bundle order position",
-                                                        "type": "uinteger"
+                                                        "type": "uinteger",
+                                                        "label": "Bundle order position"
                                                     },
                                                     {
                                                         "name": "id",
@@ -3116,35 +3102,35 @@
                                                     },
                                                     {
                                                         "name": "PatientID",
-                                                        "label": "PatientID",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "PatientID"
                                                     },
                                                     {
                                                         "name": "AppointmentTime",
-                                                        "label": "AppointmentTime",
+                                                        "time": true,
                                                         "type": "date",
-                                                        "time": true
+                                                        "label": "AppointmentTime"
                                                     },
                                                     {
                                                         "name": "Status",
-                                                        "label": "Status",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "Status"
                                                     },
                                                     {
                                                         "name": "Timestamp Creation",
-                                                        "label": "Timestamp Creation",
+                                                        "time": false,
                                                         "type": "date",
-                                                        "time": false
+                                                        "label": "Timestamp Creation"
                                                     },
                                                     {
                                                         "name": "Timestamp Last Modified",
-                                                        "label": "Timestamp Last Modified",
-                                                        "type": "date"
+                                                        "type": "date",
+                                                        "label": "Timestamp Last Modified"
                                                     },
                                                     {
                                                         "name": "Appointment Offered ",
-                                                        "label": "Appointment Offered ",
-                                                        "type": "boolean"
+                                                        "type": "boolean",
+                                                        "label": "Appointment Offered "
                                                     }
                                                 ]
                                             }
@@ -3157,7 +3143,7 @@
                                             "mapper": {
                                                 "name": "Appointment Info",
                                                 "scope": "roundtrip",
-                                                "value": "{\n  \"AppointmentOptions\": \"{{if((DiagnosisAndTriage.Severity = \\) + \"Critical\\\"; \\ + \"Call 911 or go to the ER\\\"; 28.AppointmentTime.slice(0; 3) + .join(\\ + \"; \\\"))}}\",\n  \"AppointmentSelected\": \"\",\n  \"AppointmentOffered\": \"true\"\n}"
+                                                "value": "\"mapper\": {\n    \"name\": \"Appointment Info\",\n    \"scope\": \"roundtrip\",\n    \"value\": \"{\\n  \\\"AppointmentOptions\\\": \\\"{{if((24.Severity = \\) + \"Critical\\\"; \\ + \"Call 911 or go to the ER\\\"; join(slice(28.AppointmentTime; 0; 3); \\ + \"; \\\"))}}\\\",\\n  \\\"AppointmentSelected\\\": \\\"\\\",\\n  \\\"AppointmentOffered\\\": \\\"true\\\"\\n}\"\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3214,16 +3200,16 @@
                                                 "__IMTCONN__": 3819224
                                             },
                                             "mapper": {
-                                                "base": "appfAZ25R8yk9skWh",
-                                                "typecast": false,
-                                                "useColumnId": false,
-                                                "table": "tblLcjS5HS4uoxTyg",
                                                 "id": "{{28.id}}",
+                                                "base": "appfAZ25R8yk9skWh",
+                                                "table": "tblLcjS5HS4uoxTyg",
                                                 "record": {
-                                                    "fldxjs0DAcbmwn9Tw": "{{1.from}}",
                                                     "fldlIkPcdAa1fv5Gl": "Waiting",
-                                                    "fldtSBgBUuxp1WfiS": true
-                                                }
+                                                    "fldtSBgBUuxp1WfiS": true,
+                                                    "fldxjs0DAcbmwn9Tw": "{{1.from}}"
+                                                },
+                                                "typecast": false,
+                                                "useColumnId": false
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3232,24 +3218,9 @@
                                                     "name": "Booked Appointments"
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "airtable3"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
                                                         "base": {
                                                             "label": "ClinicalSupportDB"
-                                                        },
-                                                        "typecast": {
-                                                            "mode": "chose"
-                                                        },
-                                                        "useColumnId": {
-                                                            "mode": "chose"
                                                         },
                                                         "table": {
                                                             "label": "Appointments"
@@ -3263,6 +3234,21 @@
                                                                     "mode": "chose"
                                                                 }
                                                             }
+                                                        },
+                                                        "typecast": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "useColumnId": {
+                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "airtable3"
+                                                            },
+                                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)"
                                                         }
                                                     }
                                                 },
@@ -3307,8 +3293,6 @@
                                                     },
                                                     {
                                                         "name": "record",
-                                                        "type": "collection",
-                                                        "label": "Record",
                                                         "spec": [
                                                             {
                                                                 "name": "fldxjs0DAcbmwn9Tw",
@@ -3317,28 +3301,30 @@
                                                             },
                                                             {
                                                                 "name": "fldzkhcBL4PyCkzuc",
+                                                                "time": true,
                                                                 "type": "date",
-                                                                "label": "AppointmentTime",
-                                                                "time": true
+                                                                "label": "AppointmentTime"
                                                             },
                                                             {
+                                                                "mode": "edit",
                                                                 "name": "fldlIkPcdAa1fv5Gl",
                                                                 "type": "select",
-                                                                "label": "Status",
-                                                                "mode": "edit"
+                                                                "label": "Status"
                                                             },
                                                             {
                                                                 "name": "fldaSHKQHd2XVBvGY",
+                                                                "time": false,
                                                                 "type": "date",
-                                                                "label": "Timestamp Creation",
-                                                                "time": false
+                                                                "label": "Timestamp Creation"
                                                             },
                                                             {
                                                                 "name": "fldtSBgBUuxp1WfiS",
                                                                 "type": "boolean",
                                                                 "label": "Appointment Offered "
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Record"
                                                     }
                                                 ],
                                                 "interface": [
@@ -3354,35 +3340,35 @@
                                                     },
                                                     {
                                                         "name": "PatientID",
-                                                        "label": "PatientID",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "PatientID"
                                                     },
                                                     {
                                                         "name": "AppointmentTime",
-                                                        "label": "AppointmentTime",
+                                                        "time": true,
                                                         "type": "date",
-                                                        "time": true
+                                                        "label": "AppointmentTime"
                                                     },
                                                     {
                                                         "name": "Status",
-                                                        "label": "Status",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "Status"
                                                     },
                                                     {
                                                         "name": "Timestamp Creation",
-                                                        "label": "Timestamp Creation",
+                                                        "time": false,
                                                         "type": "date",
-                                                        "time": false
+                                                        "label": "Timestamp Creation"
                                                     },
                                                     {
                                                         "name": "Timestamp Last Modified",
-                                                        "label": "Timestamp Last Modified",
-                                                        "type": "date"
+                                                        "type": "date",
+                                                        "label": "Timestamp Last Modified"
                                                     },
                                                     {
                                                         "name": "Appointment Offered ",
-                                                        "label": "Appointment Offered ",
-                                                        "type": "boolean"
+                                                        "type": "boolean",
+                                                        "label": "Appointment Offered "
                                                     }
                                                 ]
                                             }
@@ -3395,11 +3381,11 @@
                                                 "__IMTCONN__": 4228312
                                             },
                                             "mapper": {
-                                                "fromType": "phone",
                                                 "to": "{{1.from}}",
-                                                "messageBody": "body",
+                                                "body": "\"mapper\": {\n    \"fromType\": \"phone\",\n    \"to\": \"{{1.from}}\",\n    \"messageBody\": \"body\",\n    \"from\": \"+14242523727\",\n    \"body\": \"Diagnosis: {{24.Diagnosis}}\\nSeverity: {{24.Severity}}\\nInstruction: {{if((24.Severity = \\) + \"Critical\\\"; \\ + \"Seek immediate care - Call 911 or go to the ER\\\"; \\ + \"Schedule appointment: \\\" + 26.AppointmentOptions)}}\\n{{if((24.Severity != \\) + \"Critical\\\"; \\ + \"Reply with chosen slot and Patient ID: \\\" + 1.from; \\ + \"Reply 'Confirm ER' and Patient ID: \\\" + 1.from)}}\"\n}",
                                                 "from": "+14242523727",
-                                                "body": "\"Diagnosis: {{24.Diagnosis}}\\nSeverity: {{24.Severity}}\\nInstruction: {{if((24.Severity = \\) + \"Critical\\\"; \\ + \"Seek immediate care - Call 911 or go to the ER\\\"; \\ + \"Schedule appointment: \\\" + AppointmentInfo.AppointmentOptions)}}\\n{{if((24.Severity != \\) + \"Critical\\\"; \\ + \"Reply with chosen slot and Patient ID: \\\" + 1.from; \\ + \"Reply 'Confirm ER' and Patient ID: \\\" + 1.from)}}.\""
+                                                "fromType": "phone",
+                                                "messageBody": "body"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3408,26 +3394,21 @@
                                                     "name": "Available Appointments Sent"
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "CerebroAI Text",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "twilio"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
+                                                        "from": {
+                                                            "mode": "chose",
+                                                            "label": "(424) 252-3727"
+                                                        },
                                                         "fromType": {
                                                             "mode": "chose",
                                                             "label": "phone number"
                                                         },
+                                                        "mediaUrl": {
+                                                            "mode": "chose"
+                                                        },
                                                         "messageBody": {
                                                             "mode": "chose",
                                                             "label": "Create a Body"
-                                                        },
-                                                        "mediaUrl": {
-                                                            "mode": "chose"
                                                         },
                                                         "smartEncoded": {
                                                             "mode": "chose"
@@ -3437,10 +3418,15 @@
                                                         },
                                                         "provideFeedback": {
                                                             "mode": "chose"
-                                                        },
-                                                        "from": {
-                                                            "mode": "chose",
-                                                            "label": "(424) 252-3727"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "twilio"
+                                                            },
+                                                            "label": "CerebroAI Text"
                                                         }
                                                     }
                                                 },
@@ -3486,12 +3472,12 @@
                                                     },
                                                     {
                                                         "name": "mediaUrl",
-                                                        "type": "array",
-                                                        "label": "Media URL",
                                                         "spec": {
-                                                            "type": "url",
-                                                            "name": "value"
-                                                        }
+                                                            "name": "value",
+                                                            "type": "url"
+                                                        },
+                                                        "type": "array",
+                                                        "label": "Media URL"
                                                     },
                                                     {
                                                         "name": "smartEncoded",
@@ -3533,10 +3519,10 @@
                                                         "name": "body",
                                                         "type": "text",
                                                         "label": "Body",
+                                                        "required": true,
                                                         "validate": {
                                                             "max": 1600
-                                                        },
-                                                        "required": true
+                                                        }
                                                     }
                                                 ]
                                             }
@@ -3570,17 +3556,17 @@
                             },
                             "mapper": {
                                 "base": "appfAZ25R8yk9skWh",
-                                "typecast": false,
-                                "useColumnId": false,
                                 "table": "tblsDM06YJ2zpe7x0",
                                 "record": {
-                                    "fldjAq5s0FtarIjxg": "{{1.from}}",
                                     "fldZpOBb1RzjckYuY": "{{4.Symptoms}}",
+                                    "fldbpuSH7rAeBQDZj": "{{1.sid}}",
                                     "fldgg0grpoKXxWK6m": "Waiting",
-                                    "fldzyxpaFxljdk3RA": "{{4.Diagnosis}}",
-                                    "flduGiZ2j9Mrt7WSd": "{{if((4.Severity = \\) + \"Low\\\"; \\ + \"Low\\\"; (4.Severity = \\) + \"Medium\\\"; \\ + \"Medium\\\"; (4.Severity = \\) + \"High\\\"; \\ + \"High\\\"; (4.Severity = \\) + \"Critical\\\"; \\ + \"Critical\\\"; \\ + \"Low\\\")}}\"",
-                                    "fldbpuSH7rAeBQDZj": "{{1.sid}}"
-                                }
+                                    "fldjAq5s0FtarIjxg": "{{1.from}}",
+                                    "flduGiZ2j9Mrt7WSd": "{{switch(4.Severity; \\ + \"Low\\\"; \\ + \"Low\\\"; \\ + \"Medium\\\"; \\ + \"Medium\\\"; \\ + \"High\\\"; \\ + \"High\\\"; \\ + \"Critical\\\"; \\ + \"Critical\\\"; \\ + \"Low\\\")}}",
+                                    "fldzyxpaFxljdk3RA": "{{4.Diagnosis}}"
+                                },
+                                "typecast": false,
+                                "useColumnId": false
                             },
                             "metadata": {
                                 "designer": {
@@ -3588,26 +3574,12 @@
                                     "y": 486
                                 },
                                 "restore": {
-                                    "parameters": {
-                                        "__IMTCONN__": {
-                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)",
-                                            "data": {
-                                                "scoped": "true",
-                                                "connection": "airtable3"
-                                            }
-                                        }
-                                    },
                                     "expect": {
                                         "base": {
                                             "label": "ClinicalSupportDB"
                                         },
-                                        "typecast": {
-                                            "mode": "chose"
-                                        },
-                                        "useColumnId": {
-                                            "mode": "chose"
-                                        },
                                         "table": {
+                                            "label": "Interaction Point",
                                             "nested": [
                                                 {
                                                     "name": "record",
@@ -3680,8 +3652,7 @@
                                                     "type": "collection",
                                                     "label": "Record"
                                                 }
-                                            ],
-                                            "label": "Interaction Point"
+                                            ]
                                         },
                                         "record": {
                                             "nested": {
@@ -3692,6 +3663,21 @@
                                                     "mode": "edit"
                                                 }
                                             }
+                                        },
+                                        "typecast": {
+                                            "mode": "chose"
+                                        },
+                                        "useColumnId": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "airtable3"
+                                            },
+                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)"
                                         }
                                     }
                                 },
@@ -3730,8 +3716,6 @@
                                     },
                                     {
                                         "name": "record",
-                                        "type": "collection",
-                                        "label": "Record",
                                         "spec": [
                                             {
                                                 "name": "fldjAq5s0FtarIjxg",
@@ -3744,10 +3728,10 @@
                                                 "label": "Symptoms"
                                             },
                                             {
+                                                "mode": "edit",
                                                 "name": "fldgg0grpoKXxWK6m",
                                                 "type": "select",
-                                                "label": "State",
-                                                "mode": "edit"
+                                                "label": "State"
                                             },
                                             {
                                                 "name": "fldzyxpaFxljdk3RA",
@@ -3755,17 +3739,19 @@
                                                 "label": "Diagnosis"
                                             },
                                             {
+                                                "mode": "edit",
                                                 "name": "flduGiZ2j9Mrt7WSd",
                                                 "type": "select",
-                                                "label": "Severity",
-                                                "mode": "edit"
+                                                "label": "Severity"
                                             },
                                             {
                                                 "name": "fldbpuSH7rAeBQDZj",
                                                 "type": "text",
                                                 "label": "ConversationID"
                                             }
-                                        ]
+                                        ],
+                                        "type": "collection",
+                                        "label": "Record"
                                     }
                                 ],
                                 "interface": [
@@ -3781,43 +3767,43 @@
                                     },
                                     {
                                         "name": "PatientID",
-                                        "label": "PatientID",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "PatientID"
                                     },
                                     {
                                         "name": "Symptoms",
-                                        "label": "Symptoms",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "Symptoms"
                                     },
                                     {
                                         "name": "State",
-                                        "label": "State",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "State"
                                     },
                                     {
                                         "name": "Diagnosis",
-                                        "label": "Diagnosis",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "Diagnosis"
                                     },
                                     {
                                         "name": "Severity",
-                                        "label": "Severity",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "Severity"
                                     },
                                     {
                                         "name": "ConversationID",
-                                        "label": "ConversationID",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "ConversationID"
                                     },
                                     {
                                         "name": "Timestamp Last Modified",
-                                        "label": "Timestamp Last Modified",
-                                        "type": "date"
+                                        "type": "date",
+                                        "label": "Timestamp Last Modified"
                                     },
                                     {
                                         "name": "Timestamp Creation",
-                                        "label": "Timestamp Creation",
-                                        "type": "date"
+                                        "type": "date",
+                                        "label": "Timestamp Creation"
                                     }
                                 ]
                             }
@@ -4000,11 +3986,6 @@
                                             "a": "{{7.__IMTLENGTH__}}",
                                             "b": "0",
                                             "o": "number:greater"
-                                        },
-                                        {
-                                            "a": "{{7.AppointmentOffered}}",
-                                            "b": "True",
-                                            "o": "text:equal"
                                         }
                                     ]
                                 ]
@@ -4142,17 +4123,17 @@
                                 "__IMTCONN__": 3819224
                             },
                             "mapper": {
-                                "base": "appfAZ25R8yk9skWh",
-                                "typecast": false,
-                                "useColumnId": false,
-                                "table": "tblLcjS5HS4uoxTyg",
                                 "id": "{{1.account_sid}}",
+                                "base": "appfAZ25R8yk9skWh",
+                                "table": "tblLcjS5HS4uoxTyg",
                                 "record": {
-                                    "fldxjs0DAcbmwn9Tw": "{{1.from}}",
-                                    "fldzkhcBL4PyCkzuc": "{{31.`Selected Appointment`}}",
                                     "fldlIkPcdAa1fv5Gl": "Booked",
-                                    "fldtSBgBUuxp1WfiS": true
-                                }
+                                    "fldtSBgBUuxp1WfiS": true,
+                                    "fldxjs0DAcbmwn9Tw": "{{1.from}}",
+                                    "fldzkhcBL4PyCkzuc": "{{31.`Selected Appointment`}}"
+                                },
+                                "typecast": false,
+                                "useColumnId": false
                             },
                             "metadata": {
                                 "designer": {
@@ -4160,24 +4141,9 @@
                                     "y": 963
                                 },
                                 "restore": {
-                                    "parameters": {
-                                        "__IMTCONN__": {
-                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)",
-                                            "data": {
-                                                "scoped": "true",
-                                                "connection": "airtable3"
-                                            }
-                                        }
-                                    },
                                     "expect": {
                                         "base": {
                                             "label": "ClinicalSupportDB"
-                                        },
-                                        "typecast": {
-                                            "mode": "chose"
-                                        },
-                                        "useColumnId": {
-                                            "mode": "chose"
                                         },
                                         "table": {
                                             "label": "Appointments"
@@ -4191,6 +4157,21 @@
                                                     "mode": "chose"
                                                 }
                                             }
+                                        },
+                                        "typecast": {
+                                            "mode": "chose"
+                                        },
+                                        "useColumnId": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "airtable3"
+                                            },
+                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)"
                                         }
                                     }
                                 },
@@ -4235,8 +4216,6 @@
                                     },
                                     {
                                         "name": "record",
-                                        "type": "collection",
-                                        "label": "Record",
                                         "spec": [
                                             {
                                                 "name": "fldxjs0DAcbmwn9Tw",
@@ -4245,28 +4224,30 @@
                                             },
                                             {
                                                 "name": "fldzkhcBL4PyCkzuc",
+                                                "time": true,
                                                 "type": "date",
-                                                "label": "AppointmentTime",
-                                                "time": true
+                                                "label": "AppointmentTime"
                                             },
                                             {
+                                                "mode": "edit",
                                                 "name": "fldlIkPcdAa1fv5Gl",
                                                 "type": "select",
-                                                "label": "Status",
-                                                "mode": "edit"
+                                                "label": "Status"
                                             },
                                             {
                                                 "name": "fldaSHKQHd2XVBvGY",
+                                                "time": false,
                                                 "type": "date",
-                                                "label": "Timestamp Creation",
-                                                "time": false
+                                                "label": "Timestamp Creation"
                                             },
                                             {
                                                 "name": "fldtSBgBUuxp1WfiS",
                                                 "type": "boolean",
                                                 "label": "Appointment Offered "
                                             }
-                                        ]
+                                        ],
+                                        "type": "collection",
+                                        "label": "Record"
                                     }
                                 ],
                                 "interface": [
@@ -4282,35 +4263,35 @@
                                     },
                                     {
                                         "name": "PatientID",
-                                        "label": "PatientID",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "PatientID"
                                     },
                                     {
                                         "name": "AppointmentTime",
-                                        "label": "AppointmentTime",
+                                        "time": true,
                                         "type": "date",
-                                        "time": true
+                                        "label": "AppointmentTime"
                                     },
                                     {
                                         "name": "Status",
-                                        "label": "Status",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "Status"
                                     },
                                     {
                                         "name": "Timestamp Creation",
-                                        "label": "Timestamp Creation",
+                                        "time": false,
                                         "type": "date",
-                                        "time": false
+                                        "label": "Timestamp Creation"
                                     },
                                     {
                                         "name": "Timestamp Last Modified",
-                                        "label": "Timestamp Last Modified",
-                                        "type": "date"
+                                        "type": "date",
+                                        "label": "Timestamp Last Modified"
                                     },
                                     {
                                         "name": "Appointment Offered ",
-                                        "label": "Appointment Offered ",
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "label": "Appointment Offered "
                                     }
                                 ]
                             }
