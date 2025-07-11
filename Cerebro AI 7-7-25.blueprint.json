@@ -734,7 +734,7 @@
                 "type": 140534
             },
             "mapper": {
-                "json": "\"mapper\": {\n    \"json\": \"{{20.choices[0].message.content}}\"\n}"
+                "json": "{\n    \"json\": \"{{20.choices[0].message.content}}\"\n}"
             },
             "metadata": {
                 "designer": {
@@ -766,55 +766,55 @@
                 ],
                 "interface": [
                     {
-                        "help": "",
                         "name": "Symptoms",
-                        "type": "text",
                         "label": null,
+                        "help": "",
+                        "type": "text",
                         "default": null,
                         "required": false,
                         "multiline": false
                     },
                     {
-                        "help": "",
                         "name": "Severity",
-                        "type": "text",
                         "label": null,
+                        "help": "",
+                        "type": "text",
                         "default": null,
                         "required": false,
                         "multiline": false
                     },
                     {
-                        "help": "",
                         "name": "PatientID",
-                        "type": "text",
                         "label": null,
+                        "help": "",
+                        "type": "text",
                         "default": null,
                         "required": false,
                         "multiline": false
                     },
                     {
-                        "help": "",
                         "name": "State",
-                        "type": "text",
                         "label": null,
+                        "help": "",
+                        "type": "text",
                         "default": null,
                         "required": false,
                         "multiline": false
                     },
                     {
-                        "help": "",
                         "name": "Conversation ID",
-                        "type": "text",
                         "label": null,
+                        "help": "",
+                        "type": "text",
                         "default": null,
                         "required": false,
                         "multiline": false
                     },
                     {
-                        "help": "",
                         "name": "Patient ID",
-                        "type": "text",
                         "label": null,
+                        "help": "",
+                        "type": "text",
                         "default": null,
                         "required": false,
                         "multiline": false
@@ -828,7 +828,6 @@
             "version": 1,
             "parameters": {},
             "mapper": {
-                "scope": "roundtrip",
                 "variables": [
                     {
                         "name": "Symptoms",
@@ -844,7 +843,7 @@
                     },
                     {
                         "name": "Diagnosis",
-                        "value": "{{20.choices[].message.content}}"
+                        "value": "{{21.Symptoms}}"
                     },
                     {
                         "name": "Severity",
@@ -854,7 +853,8 @@
                         "name": "ConversationID",
                         "value": "{{1.account_sid}}"
                     }
-                ]
+                ],
+                "scope": "roundtrip"
             },
             "metadata": {
                 "designer": {
@@ -864,9 +864,6 @@
                 },
                 "restore": {
                     "expect": {
-                        "scope": {
-                            "label": "One cycle"
-                        },
                         "variables": {
                             "items": [
                                 null,
@@ -876,27 +873,30 @@
                                 null,
                                 null
                             ]
+                        },
+                        "scope": {
+                            "label": "One cycle"
                         }
                     }
                 },
                 "expect": [
                     {
                         "name": "variables",
+                        "type": "array",
+                        "label": "Variables",
                         "spec": [
                             {
                                 "name": "name",
-                                "type": "text",
                                 "label": "Variable name",
+                                "type": "text",
                                 "required": true
                             },
                             {
                                 "name": "value",
-                                "type": "any",
-                                "label": "Variable value"
+                                "label": "Variable value",
+                                "type": "any"
                             }
-                        ],
-                        "type": "array",
-                        "label": "Variables"
+                        ]
                     },
                     {
                         "name": "scope",
@@ -914,33 +914,33 @@
                 "interface": [
                     {
                         "name": "Symptoms",
-                        "type": "any",
-                        "label": "Symptoms"
+                        "label": "Symptoms",
+                        "type": "any"
                     },
                     {
                         "name": "PatientID",
-                        "type": "any",
-                        "label": "PatientID"
+                        "label": "PatientID",
+                        "type": "any"
                     },
                     {
                         "name": "State",
-                        "type": "any",
-                        "label": "State"
+                        "label": "State",
+                        "type": "any"
                     },
                     {
                         "name": "Diagnosis",
-                        "type": "any",
-                        "label": "Diagnosis"
+                        "label": "Diagnosis",
+                        "type": "any"
                     },
                     {
                         "name": "Severity",
-                        "type": "any",
-                        "label": "Severity"
+                        "label": "Severity",
+                        "type": "any"
                     },
                     {
                         "name": "ConversationID",
-                        "type": "any",
-                        "label": "ConversationID"
+                        "label": "ConversationID",
+                        "type": "any"
                     }
                 ]
             }
@@ -1115,6 +1115,16 @@
                     }
                 ],
                 "interface": [
+                    {
+                        "name": "__IMTLENGTH__",
+                        "label": "Total number of bundles",
+                        "type": "uinteger"
+                    },
+                    {
+                        "name": "__IMTINDEX__",
+                        "label": "Bundle order position",
+                        "type": "uinteger"
+                    },
                     {
                         "name": "id",
                         "type": "text",
@@ -1334,19 +1344,19 @@
                                 "__IMTCONN__": 3819224
                             },
                             "mapper": {
-                                "id": "{{7.id}}",
                                 "base": "appfAZ25R8yk9skWh",
-                                "table": "tblsDM06YJ2zpe7x0",
-                                "record": {
-                                    "fldZpOBb1RzjckYuY": "{{4.Symptoms}}",
-                                    "fldbpuSH7rAeBQDZj": "{{1.account_sid}}",
-                                    "fldgg0grpoKXxWK6m": "Waiting",
-                                    "fldjAq5s0FtarIjxg": "{{1.from}}",
-                                    "flduGiZ2j9Mrt7WSd": "{{switch(4.Severity; \\ + \"Low\\\"; \\ + \"Low\\\"; \\ + \"Medium\\\"; \\ + \"Medium\\\"; \\ + \"High\\\"; \\ + \"High\\\"; \\ + \"Critical\\\"; \\ + \"Critical\\\"; \\ + \"Low\\\")}}",
-                                    "fldzyxpaFxljdk3RA": "{{4.Diagnosis}}"
-                                },
                                 "typecast": false,
-                                "useColumnId": false
+                                "useColumnId": false,
+                                "table": "tblsDM06YJ2zpe7x0",
+                                "id": "{{7.id}}",
+                                "record": {
+                                    "fldjAq5s0FtarIjxg": "{{1.from}}",
+                                    "fldZpOBb1RzjckYuY": "{{4.Symptoms}}",
+                                    "fldgg0grpoKXxWK6m": "Waiting",
+                                    "fldzyxpaFxljdk3RA": "{{4.Diagnosis}}",
+                                    "flduGiZ2j9Mrt7WSd": "{{switch(4.Severity; \\ + \"Low\\\"; \\ + \"Low\\\"; \\ + \"Medium\\\"; \\ + \"Medium\\\"; \\ + \"High\\\"; \\ + \"High\\\"; \\ + \"Critical\\\"; \\ + \"Critical\\\"; \\ + \"Low\\\")}}",
+                                    "fldbpuSH7rAeBQDZj": "{{1.account_sid}}"
+                                }
                             },
                             "metadata": {
                                 "designer": {
@@ -1354,15 +1364,30 @@
                                     "y": 5
                                 },
                                 "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)",
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "airtable3"
+                                            }
+                                        }
+                                    },
                                     "expect": {
-                                        "id": {
-                                            "collapsed": true
-                                        },
                                         "base": {
                                             "label": "ClinicalSupportDB"
                                         },
+                                        "typecast": {
+                                            "mode": "chose"
+                                        },
+                                        "useColumnId": {
+                                            "mode": "chose"
+                                        },
                                         "table": {
                                             "label": "Interaction Point"
+                                        },
+                                        "id": {
+                                            "collapsed": true
                                         },
                                         "record": {
                                             "nested": {
@@ -1373,21 +1398,6 @@
                                                     "mode": "edit"
                                                 }
                                             }
-                                        },
-                                        "typecast": {
-                                            "mode": "chose"
-                                        },
-                                        "useColumnId": {
-                                            "mode": "chose"
-                                        }
-                                    },
-                                    "parameters": {
-                                        "__IMTCONN__": {
-                                            "data": {
-                                                "scoped": "true",
-                                                "connection": "airtable3"
-                                            },
-                                            "label": "My Airtable OAuth connection (User ID: usruXd4CPvvHMNVyq)"
                                         }
                                     }
                                 },
@@ -1432,6 +1442,8 @@
                                     },
                                     {
                                         "name": "record",
+                                        "type": "collection",
+                                        "label": "Record",
                                         "spec": [
                                             {
                                                 "name": "fldjAq5s0FtarIjxg",
@@ -1444,10 +1456,10 @@
                                                 "label": "Symptoms"
                                             },
                                             {
-                                                "mode": "edit",
                                                 "name": "fldgg0grpoKXxWK6m",
                                                 "type": "select",
-                                                "label": "State"
+                                                "label": "State",
+                                                "mode": "edit"
                                             },
                                             {
                                                 "name": "fldzyxpaFxljdk3RA",
@@ -1455,19 +1467,17 @@
                                                 "label": "Diagnosis"
                                             },
                                             {
-                                                "mode": "edit",
                                                 "name": "flduGiZ2j9Mrt7WSd",
                                                 "type": "select",
-                                                "label": "Severity"
+                                                "label": "Severity",
+                                                "mode": "edit"
                                             },
                                             {
                                                 "name": "fldbpuSH7rAeBQDZj",
                                                 "type": "text",
                                                 "label": "ConversationID"
                                             }
-                                        ],
-                                        "type": "collection",
-                                        "label": "Record"
+                                        ]
                                     }
                                 ],
                                 "interface": [
@@ -1483,43 +1493,43 @@
                                     },
                                     {
                                         "name": "PatientID",
-                                        "type": "text",
-                                        "label": "PatientID"
+                                        "label": "PatientID",
+                                        "type": "text"
                                     },
                                     {
                                         "name": "Symptoms",
-                                        "type": "text",
-                                        "label": "Symptoms"
+                                        "label": "Symptoms",
+                                        "type": "text"
                                     },
                                     {
                                         "name": "State",
-                                        "type": "text",
-                                        "label": "State"
+                                        "label": "State",
+                                        "type": "text"
                                     },
                                     {
                                         "name": "Diagnosis",
-                                        "type": "text",
-                                        "label": "Diagnosis"
+                                        "label": "Diagnosis",
+                                        "type": "text"
                                     },
                                     {
                                         "name": "Severity",
-                                        "type": "text",
-                                        "label": "Severity"
+                                        "label": "Severity",
+                                        "type": "text"
                                     },
                                     {
                                         "name": "ConversationID",
-                                        "type": "text",
-                                        "label": "ConversationID"
+                                        "label": "ConversationID",
+                                        "type": "text"
                                     },
                                     {
                                         "name": "Timestamp Last Modified",
-                                        "type": "date",
-                                        "label": "Timestamp Last Modified"
+                                        "label": "Timestamp Last Modified",
+                                        "type": "date"
                                     },
                                     {
                                         "name": "Timestamp Creation",
-                                        "type": "date",
-                                        "label": "Timestamp Creation"
+                                        "label": "Timestamp Creation",
+                                        "type": "date"
                                     }
                                 ]
                             }
@@ -1533,11 +1543,10 @@
                                 "space": ""
                             },
                             "mapper": {
-                                "State": "{{4.State}}",
-                                "Severity": "{{4.Severity}}",
                                 "Symptoms": "{{4.Symptoms}}",
+                                "Severity": "{{4.Severity}}",
                                 "PatientID": "{{1.from}}",
-                                "Patient ID": "",
+                                "State": "{{4.State}}",
                                 "Conversation ID": "{{1.sid}}"
                             },
                             "metadata": {
@@ -1600,11 +1609,6 @@
                                         "name": "Conversation ID",
                                         "type": "text",
                                         "label": null
-                                    },
-                                    {
-                                        "name": "Patient ID",
-                                        "type": "text",
-                                        "label": null
                                     }
                                 ]
                             }
@@ -1617,7 +1621,7 @@
                                 "type": 140534
                             },
                             "mapper": {
-                                "json": "{\n  \"Symptoms\": \"text\",\n  \"Patient ID\": \"text\",\n  \"State\": \"text\",\n  \"ConversationID\": \"text\",\n  \"Record ID\": \"text\"\n}"
+                                "json": "{{17.json}}"
                             },
                             "metadata": {
                                 "designer": {
@@ -1648,55 +1652,46 @@
                                 ],
                                 "interface": [
                                     {
-                                        "help": "",
                                         "name": "Symptoms",
-                                        "type": "text",
                                         "label": null,
+                                        "help": "",
+                                        "type": "text",
                                         "default": null,
                                         "required": false,
                                         "multiline": false
                                     },
                                     {
-                                        "help": "",
                                         "name": "Severity",
-                                        "type": "text",
                                         "label": null,
+                                        "help": "",
+                                        "type": "text",
                                         "default": null,
                                         "required": false,
                                         "multiline": false
                                     },
                                     {
-                                        "help": "",
                                         "name": "PatientID",
-                                        "type": "text",
                                         "label": null,
+                                        "help": "",
+                                        "type": "text",
                                         "default": null,
                                         "required": false,
                                         "multiline": false
                                     },
                                     {
-                                        "help": "",
                                         "name": "State",
-                                        "type": "text",
                                         "label": null,
+                                        "help": "",
+                                        "type": "text",
                                         "default": null,
                                         "required": false,
                                         "multiline": false
                                     },
                                     {
-                                        "help": "",
                                         "name": "Conversation ID",
-                                        "type": "text",
                                         "label": null,
-                                        "default": null,
-                                        "required": false,
-                                        "multiline": false
-                                    },
-                                    {
                                         "help": "",
-                                        "name": "Patient ID",
                                         "type": "text",
-                                        "label": null,
                                         "default": null,
                                         "required": false,
                                         "multiline": false
@@ -2669,7 +2664,7 @@
                                             "mapper": {
                                                 "name": "Diagnosis and Triage",
                                                 "scope": "roundtrip",
-                                                "value": "\"id\": 24,\n\"module\": \"util:SetVariables\",\n\"version\": 1,\n\"parameters\": {},\n\"filter\": {\n    \"name\": \"Diagnosis Complete\",\n    \"conditions\": [\n        [\n            {\n                \"a\": \"{{19.result.diagnosis}}\",\n                \"b\": \"\",\n                \"o\": \"text:notempty\"\n            }\n        ]\n    ]\n},\n\"mapper\": {\n    \"scope\": \"roundtrip\",\n    \"variables\": [\n        {\n            \"name\": \"Diagnosis\",\n            \"value\": \"{{19.result.diagnosis}}\"\n        },\n        {\n            \"name\": \"Severity\",\n            \"value\": \"{{19.result.severity}}\"\n        },\n        {\n            \"name\": \"Symptoms\",\n            \"value\": \"{{19.result.symptoms}}\"\n        }\n    ]\n},\n\"metadata\": {\n    \"designer\": {\n        \"x\": 2294,\n        \"y\": 340,\n        \"name\": \"Diagnosis&Triage\"\n    },\n    \"restore\": {\n        \"expect\": {\n            \"scope\": {\n                \"label\": \"One cycle\"\n            }\n        }\n    },\n    \"expect\": [\n        {\n            \"name\": \"variables\",\n            \"spec\": [\n                {\n                    \"name\": \"name\",\n                    \"type\": \"text\",\n                    \"label\": \"Variable name\",\n                    \"required\": true\n                },\n                {\n                    \"name\": \"value\",\n                    \"type\": \"any\",\n                    \"label\": \"Variable value\"\n                }\n            ],\n            \"type\": \"array\",\n            \"label\": \"Variables\"\n        },\n        {\n            \"name\": \"scope\",\n            \"type\": \"select\",\n            \"label\": \"Variable lifetime\",\n            \"required\": true,\n            \"validate\": {\n                \"enum\": [\n                    \"roundtrip\",\n                    \"execution\"\n                ]\n            }\n        }\n    ],\n    \"interface\": [\n        {\n            \"name\": \"Diagnosis\",\n            \"type\": \"any\",\n            \"label\": \"Diagnosis\"\n        },\n        {\n            \"name\": \"Severity\",\n            \"type\": \"any\",\n            \"label\": \"Severity\"\n        },\n        {\n            \"name\": \"Symptoms\",\n            \"type\": \"any\",\n            \"label\": \"Symptoms\"\n        }\n    ],\n    \"advanced\": true\n}"
+                                                "value": "{{19.result.diagnosis}}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -2712,8 +2707,8 @@
                                                 "interface": [
                                                     {
                                                         "name": "Diagnosis and Triage",
-                                                        "type": "any",
-                                                        "label": "Diagnosis and Triage"
+                                                        "label": "Diagnosis and Triage",
+                                                        "type": "any"
                                                     }
                                                 ],
                                                 "advanced": true
@@ -3143,7 +3138,7 @@
                                             "mapper": {
                                                 "name": "Appointment Info",
                                                 "scope": "roundtrip",
-                                                "value": "\"mapper\": {\n    \"name\": \"Appointment Info\",\n    \"scope\": \"roundtrip\",\n    \"value\": \"{\\n  \\\"AppointmentOptions\\\": \\\"{{if((24.Severity = \\) + \"Critical\\\"; \\ + \"Call 911 or go to the ER\\\"; join(slice(28.AppointmentTime; 0; 3); \\ + \"; \\\"))}}\\\",\\n  \\\"AppointmentSelected\\\": \\\"\\\",\\n  \\\"AppointmentOffered\\\": \\\"true\\\"\\n}\"\n}"
+                                                "value": "if(24.Severity = \"Critical\"; \"Call 911 or go to the ER\"; join(slice(28.AppointmentTime; 1; 3); \"; \"))"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3186,8 +3181,8 @@
                                                 "interface": [
                                                     {
                                                         "name": "Appointment Info",
-                                                        "type": "any",
-                                                        "label": "Appointment Info"
+                                                        "label": "Appointment Info",
+                                                        "type": "any"
                                                     }
                                                 ]
                                             }
@@ -3381,11 +3376,11 @@
                                                 "__IMTCONN__": 4228312
                                             },
                                             "mapper": {
-                                                "to": "{{1.from}}",
-                                                "body": "\"mapper\": {\n    \"fromType\": \"phone\",\n    \"to\": \"{{1.from}}\",\n    \"messageBody\": \"body\",\n    \"from\": \"+14242523727\",\n    \"body\": \"Diagnosis: {{24.Diagnosis}}\\nSeverity: {{24.Severity}}\\nInstruction: {{if((24.Severity = \\) + \"Critical\\\"; \\ + \"Seek immediate care - Call 911 or go to the ER\\\"; \\ + \"Schedule appointment: \\\" + 26.AppointmentOptions)}}\\n{{if((24.Severity != \\) + \"Critical\\\"; \\ + \"Reply with chosen slot and Patient ID: \\\" + 1.from; \\ + \"Reply 'Confirm ER' and Patient ID: \\\" + 1.from)}}\"\n}",
-                                                "from": "+14242523727",
                                                 "fromType": "phone",
-                                                "messageBody": "body"
+                                                "to": "{{1.from}}",
+                                                "messageBody": "body",
+                                                "from": "+14242523727",
+                                                "body": "Diagnosis: {{24.Diagnosis}}\\nSeverity: {{24.Severity}}\\n...\" (concatenated string)"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3394,21 +3389,26 @@
                                                     "name": "Available Appointments Sent"
                                                 },
                                                 "restore": {
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "label": "CerebroAI Text",
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "twilio"
+                                                            }
+                                                        }
+                                                    },
                                                     "expect": {
-                                                        "from": {
-                                                            "mode": "chose",
-                                                            "label": "(424) 252-3727"
-                                                        },
                                                         "fromType": {
                                                             "mode": "chose",
                                                             "label": "phone number"
                                                         },
-                                                        "mediaUrl": {
-                                                            "mode": "chose"
-                                                        },
                                                         "messageBody": {
                                                             "mode": "chose",
                                                             "label": "Create a Body"
+                                                        },
+                                                        "mediaUrl": {
+                                                            "mode": "chose"
                                                         },
                                                         "smartEncoded": {
                                                             "mode": "chose"
@@ -3418,15 +3418,10 @@
                                                         },
                                                         "provideFeedback": {
                                                             "mode": "chose"
-                                                        }
-                                                    },
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "twilio"
-                                                            },
-                                                            "label": "CerebroAI Text"
+                                                        },
+                                                        "from": {
+                                                            "mode": "chose",
+                                                            "label": "(424) 252-3727"
                                                         }
                                                     }
                                                 },
@@ -3472,12 +3467,12 @@
                                                     },
                                                     {
                                                         "name": "mediaUrl",
-                                                        "spec": {
-                                                            "name": "value",
-                                                            "type": "url"
-                                                        },
                                                         "type": "array",
-                                                        "label": "Media URL"
+                                                        "label": "Media URL",
+                                                        "spec": {
+                                                            "type": "url",
+                                                            "name": "value"
+                                                        }
                                                     },
                                                     {
                                                         "name": "smartEncoded",
@@ -3519,10 +3514,10 @@
                                                         "name": "body",
                                                         "type": "text",
                                                         "label": "Body",
-                                                        "required": true,
                                                         "validate": {
                                                             "max": 1600
-                                                        }
+                                                        },
+                                                        "required": true
                                                     }
                                                 ]
                                             }
@@ -4304,33 +4299,45 @@
                                 "__IMTCONN__": 4228312
                             },
                             "mapper": {
-                                "to": "{{1.from}}",
-                                "body": "Diagnosis: \\nSeverity: \\nInstruction:\\nAppointment Options:\\n{{map(28; \"Option : \" + formatDate(; \"YYYY-MM-DD HH:mm\") + \"\\n\"; 3)}}\\nReply with option number and Patient ID: {{1.from}}.",
-                                "from": "+14242523727",
                                 "fromType": "phone",
-                                "messageBody": "body"
+                                "to": "{{1.from}}",
+                                "messageBody": "body",
+                                "from": "+14242523727",
+                                "body": "{24.Diagnosis}}, {{24.Severity}}map(28.AppointmentTime; \"Option \" + index + \": \" + formatDate(AppointmentTime; \"YYYY-MM-DD HH:mm\") + \"\\n\")"
                             },
                             "metadata": {
                                 "designer": {
                                     "x": 1668,
-                                    "y": 961
+                                    "y": 961,
+                                    "messages": [
+                                        {
+                                            "category": "reference",
+                                            "severity": "warning",
+                                            "message": "Referenced module 'Tools - Set variable' [24] is not accessible."
+                                        }
+                                    ]
                                 },
                                 "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "CerebroAI Text",
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "twilio"
+                                            }
+                                        }
+                                    },
                                     "expect": {
-                                        "from": {
-                                            "mode": "chose",
-                                            "label": "(424) 252-3727"
-                                        },
                                         "fromType": {
                                             "mode": "chose",
                                             "label": "phone number"
                                         },
-                                        "mediaUrl": {
-                                            "mode": "chose"
-                                        },
                                         "messageBody": {
                                             "mode": "chose",
                                             "label": "Create a Body"
+                                        },
+                                        "mediaUrl": {
+                                            "mode": "chose"
                                         },
                                         "smartEncoded": {
                                             "mode": "chose"
@@ -4340,15 +4347,10 @@
                                         },
                                         "provideFeedback": {
                                             "mode": "chose"
-                                        }
-                                    },
-                                    "parameters": {
-                                        "__IMTCONN__": {
-                                            "data": {
-                                                "scoped": "true",
-                                                "connection": "twilio"
-                                            },
-                                            "label": "CerebroAI Text"
+                                        },
+                                        "from": {
+                                            "mode": "chose",
+                                            "label": "(424) 252-3727"
                                         }
                                     }
                                 },
@@ -4394,12 +4396,12 @@
                                     },
                                     {
                                         "name": "mediaUrl",
-                                        "spec": {
-                                            "name": "value",
-                                            "type": "url"
-                                        },
                                         "type": "array",
-                                        "label": "Media URL"
+                                        "label": "Media URL",
+                                        "spec": {
+                                            "type": "url",
+                                            "name": "value"
+                                        }
                                     },
                                     {
                                         "name": "smartEncoded",
@@ -4441,10 +4443,10 @@
                                         "name": "body",
                                         "type": "text",
                                         "label": "Body",
-                                        "required": true,
                                         "validate": {
                                             "max": 1600
-                                        }
+                                        },
+                                        "required": true
                                     }
                                 ]
                             }
